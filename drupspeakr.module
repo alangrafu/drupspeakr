@@ -1,0 +1,120 @@
+<?
+
+/* Display help and module information
+ * @param path which path of the site we're displaying help
+ * @param arg array that holds the current path as would be returned from arg() function
+ * @return help text for the path
+ */
+function drupspeakr_help($path, $arg) {
+  $output = '';  //declare your output variable
+  switch ($path) {
+    case "admin/help#lodspeakr":
+      $output = '<p>'.  t("Permissions to use LODSPeaKr") .'</p>';
+      break;
+  }
+  return $output;
+} // function drupspeakr_help
+
+function drupspeakr_perm() {
+  return array('access lodspeakr content', 'administer lodspeakr');
+} // function drupspeakr_perm()
+
+function drupspeakr_admin_form() {
+  global $base_url;
+  $form = array();
+
+  $form['lodspeakr_endpoint'] = array(
+    '#type' => 'textfield',
+    '#title' => t('SPARQL Endpoint'),
+    '#default_value' => variable_get('lodspeakr_endpoint', 'http://localhost/sparql'),
+    '#size' => 100,
+    '#maxlength' => 200,
+    '#description' => t("URL of the SPARQL endpoint."),
+    '#required' => TRUE,
+  );
+
+    $form['lodspeakr_local_ns'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Local Namespace'),
+    '#default_value' => variable_get('lodspeakr_local_ns', $base_url),
+    '#size' => 100,
+    '#maxlength' => 200,
+    '#description' => t("Local Namespace."),
+    '#required' => TRUE,
+  );
+  
+  return system_settings_form($form);
+}
+
+function drupspeakr_view_conf(){
+  $output = "";
+  $output = "SPARQL Endpoint: ".variable_get('lodspeakr_endpoint', 'not set') . '<br />';
+  return $output;
+}
+
+function drupspeakr_menu() {
+
+  $items = array();
+
+  $items['admin/settings/lodspeakr'] = array(
+    'title' => t('LODSPeaKr'),
+    'description' => t('Settings for LODSPeaKr'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('drupspeakr_admin_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+
+  $items['lodspeakr'] = array(
+    'title' => '',
+    'access arguments' => array('access lodspeakr content'),
+    'page callback' => 'drupspeakr_all',
+    'type' => MENU_CALLBACK
+  );
+  return $items;
+}
+
+function drupspeakr_all(){
+  global $base_url;
+  
+  //$keys = $_REQUEST['destination'] ? $_REQUEST['destination'] : $_REQUEST['q'];
+  $keys = $_GET['ls'];
+  $uri = $base_url."/".$keys;
+  
+  
+  $lodspeakr_conf['endpoint']['local'] = variable_get('lodspeakr_endpoint', 'http://localhost/sparql');
+  $lodspeakr_conf['ns']['local'] = variable_get('lodspeakr_local_ns', 'http://localhost/sparql');
+  $lodspeakr_conf['home'] = getcwd().'/'.drupal_get_path('module', 'drupspeakr').'/lib/lodspeakr/';
+  $lodspeakr_conf['basedir'] = $base_url.'/';
+  $lodspeakr_conf['root'] = $base_url;
+  $lodspeakr_conf['debug'] = false;
+  $lodspeakr_conf['q'] = $uri;
+    //$page_content = var_export($lodspeakr_conf, true);
+
+  if(!require_once('lib/lodspeakr/index.inc')){
+    drupal_set_message("Couldn't load LODSPeaKr", 'error', TRUE);
+    return $page_content;
+  }
+  $aux = _lodspeakr_main($lodspeakr_conf);
+  $page_content .= $aux;
+  return $page_content;
+}
+/*function drupspeakr_init(){
+global $base_url;
+$page_content = variable_get('lodspeakr_local_ns', 'not set')."\n";
+$page_content .=$base_url.'/'.drupal_get_normal_path(trim($_GET['q'], '/'));
+return $page_content;
+  global $base_url;
+  $page_content = '';
+  $keys = $_REQUEST['destination'] ? $_REQUEST['destination'] : $_REQUEST['q'];
+  $keys = $_GET['ls'];
+  $uri = $base_url."/".$keys;
+  if(!require_once('lib/lodspeakr/index.inc')){
+    drupal_set_message("Couldn't load LODSPeaKr", 'error', TRUE);
+    return $page_content;
+  }
+  $aux = _lodspeakr_main($uri);
+  $page_content .= $aux;
+  return $page_content;
+}*/
+
