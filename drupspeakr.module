@@ -85,7 +85,7 @@ function drupspeakr_all(){
   $lodspeakr_conf['endpoint']['local'] = variable_get('lodspeakr_endpoint', 'http://localhost/sparql');
   $lodspeakr_conf['ns']['local'] = variable_get('lodspeakr_local_ns', 'http://localhost/sparql');
   $lodspeakr_conf['home'] = getcwd().'/'.drupal_get_path('module', 'drupspeakr').'/lib/lodspeakr/';
-  $lodspeakr_conf['basedir'] = $base_url.'/';
+  $lodspeakr_conf['basedir'] = variable_get('lodspeakr_local_ns', 'http://localhost/sparql');//$base_url.'/';
   $lodspeakr_conf['root'] = $base_url;
   $lodspeakr_conf['debug'] = false;
   $lodspeakr_conf['q'] = $uri;
