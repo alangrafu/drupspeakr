@@ -1,0 +1,38 @@
+==Drupspeakr==
+
+This is a Drupal module that allow the integration of semantic data in Drupal using LODSPeaKr (http://lodspeakr.org)
+
+
+==Installation==
+
+0) Lets assume drupal is installed in http://example.org/mysite and the data has the form http://example.org/mysite/data/foo, http://example.org/mysite/data/bar, etc.
+
+1) Download the module in $DRUPAL_HOME/site/all/modules/ dir
+
+ git clone git://github.com/alangrafu/drupspeakr.git
+
+
+2) In $DRUPAL_HOME/.htaccess add the following lines before the RewriteCond at the bottom (if you already have a RewriteBase you don't need to include it again).
+
+  RewriteBase /mysite
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !=/favicon.ico
+  RewriteRule ^data/(.*) lodspeakr?ls=data/$1 [L,QSA]
+
+3) Give recursive write permissions to the webserver to write on $DRUPAL_HOME/site/all/modules/drupspeakr/lib/lodspeakr/cache and $DRUPAL_HOME/site/all/modules/drupspeakr/lib/lodspeakr/meta similar to what you did on Drupal's settings.php
+
+
+4) In your drupal installation go to /admin/settings/lodspeakr and define 
+  SPARQL Endpoint: URL of your SPARQL endpoint
+  Local Namespace: Since the data hast the form http://example.org/mysite/data/foo,
+                   we will define the local namespace as "http://example.org/mysite/data/" (final slash included)
+
+5) When you retrieve a URI (say http://example.org/mysite/data/foo) you should be redirected to http://example.org/mysite/data/foo/html that will be a Drupal page showing all the predicates pointed by and pointed to the original URI.
+
+
+==TODO==
+
+* Integration with Drupal is not perfect yet, that should change soon
+* You still need to manage views and models in LODSPeaKr by accessing the filesystem
+* Lots of other things and ideas
