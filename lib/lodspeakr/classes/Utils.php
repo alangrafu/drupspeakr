@@ -155,7 +155,7 @@ class Utils{
   
   private static function serializeRdf($data, $extension){
   	global	$conf;
-  	require('lib/arc2/ARC2.php');
+  	require($conf['home'].'lib/arc2/ARC2.php');
   	$parser = ARC2::getRDFParser();
   	$parser->parse($conf['basedir'], $data);
   	$triples = $parser->getTriples();
